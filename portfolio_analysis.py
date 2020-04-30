@@ -59,7 +59,7 @@ def position_adjust(daily_positions, sale):
 
 def portfolio_start_balance(portfolio, start_date):
     positions_before_start = portfolio[portfolio['Open date'] <= start_date]
-    future_sales = portfolio[(portfolio['Open date'] >= start_date) & (portfolio['Type'] == 'Sell.FIFO')]
+    future_positions = portfolio[portfolio['Open date'] >= start_date]
     sales = positions_before_start[positions_before_start['Type'] == 'Sell.FIFO'].groupby(['Symbol'])['Qty'].sum()
     sales = sales.reset_index()
     positions_no_change = positions_before_start[~positions_before_start['Symbol'].isin(sales['Symbol'].unique())]
@@ -68,7 +68,7 @@ def portfolio_start_balance(portfolio, start_date):
         adj_positions = position_adjust(positions_before_start, sale)
         adj_positions_df = adj_positions_df.append(adj_positions)
     adj_positions_df = adj_positions_df.append(positions_no_change)
-    adj_positions_df = adj_positions_df.append(future_sales)
+    adj_positions_df = adj_positions_df.append(future_positions)
     adj_positions_df = adj_positions_df[adj_positions_df['Qty'] > 0]
     return adj_positions_df
 
